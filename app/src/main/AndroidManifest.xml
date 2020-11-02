@@ -16,8 +16,7 @@
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppyHireMusharibAl">
-        <activity android:name="com.innobles.appyhiremusharib.ui.main.view.MainActivity"
-            android:launchMode="singleTop">
+        <activity android:name="com.innobles.appyhiremusharib.ui.main.view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />
