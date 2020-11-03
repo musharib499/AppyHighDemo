@@ -17,6 +17,7 @@ import com.innobles.appyhiremusharib.networkcall.module.NewsFeedResponse
 import com.innobles.appyhiremusharib.networkcall.module.SearchResult
 import com.innobles.appyhiremusharib.ui.main.view.adapter.BaseAdapterBinding
 import com.innobles.appyhiremusharib.ui.main.viewModel.MainViewModel
+import com.innobles.appyhiremusharib.ui.main.viewModel.USViewModel
 
 
 class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
@@ -25,7 +26,7 @@ class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
         fun newInstance() = USFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: USViewModel
     private lateinit var binding: MainFragmentBinding
     private lateinit var baseAdapterBinding: BaseAdapterBinding<NewsFeedResponse.Article?>
     private val searchResultsQueue = ArrayDeque<SearchResult>()
@@ -36,24 +37,21 @@ class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
         savedInstanceState: Bundle?
     ): View {
         binding = MainFragmentBinding.inflate(inflater, container, false)
+        setUp()
         return binding.root
+    }
+
+    private fun setUp(){
+        viewModel = activity?.let { ViewModelProvider(it).get(USViewModel::class.java) }!!
+        setLiveData()
+        setCategoryData()
+        onSearching()
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = activity?.let { ViewModelProvider(it).get(MainViewModel::class.java) }!!
-        baseAdapterBinding = BaseAdapterBinding(
-            activity?.baseContext!!,
-            arrayListOf(),
-            this,
-            R.layout.item_feed_news
-        )
-        binding.recyclerView.adapter = baseAdapterBinding
-        baseAdapterBinding.setHeader(R.layout.item_catagory)
-        setLiveData()
-        setCategoryData()
-        onSearching()
+
 
     }
 
@@ -65,8 +63,7 @@ class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
             R.layout.item_feed_news
         )
         binding.recyclerView.adapter = baseAdapterBinding
-        viewModel.fetchArticleUs()
-        viewModel.usarticle.observe(viewLifecycleOwner, {
+        viewModel.article.observe(viewLifecycleOwner, {
             binding.search.clearSearch()
             when (it.status) {
 
@@ -102,7 +99,7 @@ class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
             currentSearchResult?.let { c -> searchResultsQueue.add(c) } ?: kotlin.run {
                 currentSearchResult = SearchResult(it, searchResultFor)
             }
-            viewModel.fetchArticleUs(search = it)
+            viewModel.fetchArticle(search = it)
         }
 
     }
@@ -114,7 +111,7 @@ class USFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
             val chip: Chip =
                 layoutInflater.inflate(R.layout.item_categorie_tag, null, false) as Chip
             chip.setOnCheckedChangeListener { _, _ ->
-                item.key?.let { viewModel.fetchArticleUs(category = it) }
+                item.key?.let { viewModel.fetchArticle(category = it) }
 
             }
             chip.text = item.value

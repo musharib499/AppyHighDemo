@@ -35,6 +35,7 @@ class MainFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
         savedInstanceState: Bundle?
     ): View {
         binding = MainFragmentBinding.inflate(inflater, container, false)
+        setUp()
         return binding.root
     }
 
@@ -44,14 +45,11 @@ class MainFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
         setHasOptionsMenu(true)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun setUp(){
         viewModel = activity?.let { ViewModelProvider(it).get(MainViewModel::class.java) }!!
         setLiveData()
         setCategoryData()
         onSearching()
-
-
     }
 
 
@@ -63,7 +61,6 @@ class MainFragment : Fragment(), BaseAdapterBinding.BindAdapterListener {
             R.layout.item_feed_news
         )
         binding.recyclerView.adapter = baseAdapterBinding
-        viewModel.fetchArticle()
         viewModel.article.observe(viewLifecycleOwner, {
             binding.search.clearSearch()
             when (it.status) {
